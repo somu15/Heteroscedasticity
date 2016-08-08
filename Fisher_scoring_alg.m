@@ -102,16 +102,20 @@ legend('Exact (~1000 simulations)','Fisher scoring algorithm (88 simulations)');
 % CEPEDA-GAMERMAN CORRECTION FOR DEPENDENT VARIABLE TO ENSURE GOOD
 % ACCEPTANCE RATES FOR PROPOSALS (this is Bayesian)
 % QUADRATIC VARIANCE FUNCTION 
-clear all
+%clear all
 clc
-file_path  = 'C:\Users\lakshd5\Dropbox\Bayesian_IM_selection\Accounting for heteroskedasticity\data\PFA1\';
-Sa = importdata(strcat(file_path,'x.txt'));
+for iii = 1:1000;
+[IM,EDP] = data_selection(data,5);
+%file_path  = 'C:\Users\lakshd5\Dropbox\Bayesian_IM_selection\Accounting for heteroskedasticity\data\PFA1\';
+Sa = IM;
+Dr = EDP;
+%Sa = importdata(strcat(file_path,'x.txt'));
 % display('Independent is Sa3')
 %fp = 'C:\Users\lakshd5\Dropbox\Bayesian_IM_selection\Accounting for heteroskedasticity\Final analysis 05_28_2016\FEMA records unscaled\RD\';
 % eps = importdata(strcat(fp,'eps_sa1.txt'));
 % display('eps is Sa3')
 %Sa = Sa(1:41);
-Dr = importdata(strcat(file_path,'y.txt'));
+%Dr = importdata(strcat(file_path,'y.txt'));
 
 
 % M = importdata(strcat(fp,'Mw.txt'));
@@ -157,6 +161,10 @@ break
 end
 end
 parameters_Freq = parameters;
+freq(:,iii) = parameters_Freq;
+end
+var(freq')
+%%
 parameters_Freq
 beta_mean_pri = parameters(1:2);
 gamma_mean_pri = 0.0000001*parameters(3:max(size(parameters)));
@@ -204,15 +212,17 @@ K = cov(gamma_new(1000:max_iter,1),gamma_new(1000:max_iter,3));
 cov_matrix_bayes(3,5) = K(1,2);
 cov_matrix_bayes(5,3) = K(1,2);
 parameters_bayes = parameters_bayes';
-parameters_bayes
-cov_matrix
-cov_matrix_bayes
+bayes(:,iii) = parameters_bayes;
+
+% parameters_bayes
+% cov_matrix
+% cov_matrix_bayes
 %K = exp(parameters_bayes(3)+parameters_bayes(4)*(Sa)+parameters_bayes(5)*(Sa).^2);
-subplot(1,2,2)
-hist(Sa)
-xlabel('Sa(T1)')
-ylabel('Frequency')
-subplot(1,2,1)
+% subplot(1,2,2)
+% hist(Sa)
+% xlabel('Sa(T1)')
+% ylabel('Frequency')
+%subplot(1,2,1)
 % subplot(3,2,1)
 % plot(10:max_iter,beta_prop(10:max_iter,1))
 % grid on
@@ -238,38 +248,38 @@ subplot(1,2,1)
 % grid on
 % xlabel('Iteration')
 % ylabel('Gamma 3')
-% subplot(3,2,6)
-sa_range = 0.05:0.05:2;
-exact = importdata('C:\Users\lakshd5\Dropbox\Bayesian_IM_selection\Accounting for heteroskedasticity\data\PFA1\Exact_stds_2g.txt');
-reg_para = importdata('C:\Users\lakshd5\Dropbox\Bayesian_IM_selection\Accounting for heteroskedasticity\data\PFA1\reg.txt');
-plot(sa_range,sqrt((exp(parameters(3)+parameters(4)*(sa_range)+parameters(5)*(sa_range).^2))),'red','linewidth',1.5)
-hold on
-plot(sa_range,sqrt(exp(parameters_bayes(3)+parameters_bayes(4)*(sa_range)+parameters_bayes(5)*(sa_range).^2)),sa_range,sqrt((exp(reg_para(1)+reg_para(2)*(sa_range)+reg_para(3)*(sa_range).^2))),'green','linewidth',1.5)%
-hold on
-% ex = interp1(exact(:,1),exact(:,2),sa_range);
-% scatter(exact(:,1),exact(:,2))
+% % subplot(3,2,6)
+% sa_range = 0.05:0.05:2;
+% exact = importdata('C:\Users\lakshd5\Dropbox\Bayesian_IM_selection\Accounting for heteroskedasticity\data\PFA1\Exact_stds_2g.txt');
+% reg_para = importdata('C:\Users\lakshd5\Dropbox\Bayesian_IM_selection\Accounting for heteroskedasticity\data\PFA1\reg.txt');
+% plot(sa_range,sqrt((exp(parameters(3)+parameters(4)*(sa_range)+parameters(5)*(sa_range).^2))),'red','linewidth',1.5)
 % hold on
-scatter(exact(:,1),exact(:,2))
-%rBayes = rsquare(exact(:,2),sqrt(exp(parameters_bayes(3)+parameters_bayes(4)*(exact(:,1))+parameters_bayes(5)*(exact(:,1)).^2)));
-SSE_Bayes = sum((exact(:,2)-sqrt(exp(parameters_bayes(3)+parameters_bayes(4)*(exact(:,1))+parameters_bayes(5)*(exact(:,1)).^2))).^2);
-%rFreq = rsquare(exact(:,2),sqrt((exp(parameters(3)+parameters(4)*(exact(:,1))+parameters(5)*(exact(:,1)).^2))));
-SSE_Freq = sum((exact(:,2)-sqrt((exp(parameters(3)+parameters(4)*(exact(:,1))+parameters(5)*(exact(:,1)).^2)))).^2);
-%rFit = rsquare(exact(:,2),sqrt((exp(-3.83+2.91*(exact(:,1))-1.02*(exact(:,1)).^2))));
-SSE_Fit = sum((exact(:,2)'-sqrt((exp(reg_para(1)+reg_para(2)*(sa_range)+reg_para(3)*(sa_range).^2)))).^2);
-% rBayes
-% rFreq
-% rFit
-SSE_Bayes
-SSE_Freq
-SSE_Fit
-reg_para
-std_freq = sqrt((exp(parameters(3)+parameters(4)*(sa_range)+parameters(5)*(sa_range).^2)));
-std_bayes = sqrt(exp(parameters_bayes(3)+parameters_bayes(4)*(sa_range)+parameters_bayes(5)*(sa_range).^2));
-std_exact = sqrt((exp(reg_para(1)+reg_para(2)*(sa_range)+reg_para(3)*(sa_range).^2)));
-grid on
-xlabel('Sa (g)')
-ylabel('Standard deviation in roof drift')
-legend(strcat('Frequentist SSE = ',num2str(SSE_Freq)),strcat('Bayesian SSE = ',num2str(SSE_Bayes)),strcat('Fit to actual data SSE = ',num2str(SSE_Fit)))
+% plot(sa_range,sqrt(exp(parameters_bayes(3)+parameters_bayes(4)*(sa_range)+parameters_bayes(5)*(sa_range).^2)),sa_range,sqrt((exp(reg_para(1)+reg_para(2)*(sa_range)+reg_para(3)*(sa_range).^2))),'green','linewidth',1.5)%
+% hold on
+% % ex = interp1(exact(:,1),exact(:,2),sa_range);
+% % scatter(exact(:,1),exact(:,2))
+% % hold on
+% scatter(exact(:,1),exact(:,2))
+% %rBayes = rsquare(exact(:,2),sqrt(exp(parameters_bayes(3)+parameters_bayes(4)*(exact(:,1))+parameters_bayes(5)*(exact(:,1)).^2)));
+% SSE_Bayes = sum((exact(:,2)-sqrt(exp(parameters_bayes(3)+parameters_bayes(4)*(exact(:,1))+parameters_bayes(5)*(exact(:,1)).^2))).^2);
+% %rFreq = rsquare(exact(:,2),sqrt((exp(parameters(3)+parameters(4)*(exact(:,1))+parameters(5)*(exact(:,1)).^2))));
+% SSE_Freq = sum((exact(:,2)-sqrt((exp(parameters(3)+parameters(4)*(exact(:,1))+parameters(5)*(exact(:,1)).^2)))).^2);
+% %rFit = rsquare(exact(:,2),sqrt((exp(-3.83+2.91*(exact(:,1))-1.02*(exact(:,1)).^2))));
+% SSE_Fit = sum((exact(:,2)'-sqrt((exp(reg_para(1)+reg_para(2)*(sa_range)+reg_para(3)*(sa_range).^2)))).^2);
+% % rBayes
+% % rFreq
+% % rFit
+% SSE_Bayes
+% SSE_Freq
+% SSE_Fit
+% reg_para
+% std_freq = sqrt((exp(parameters(3)+parameters(4)*(sa_range)+parameters(5)*(sa_range).^2)));
+% std_bayes = sqrt(exp(parameters_bayes(3)+parameters_bayes(4)*(sa_range)+parameters_bayes(5)*(sa_range).^2));
+% std_exact = sqrt((exp(reg_para(1)+reg_para(2)*(sa_range)+reg_para(3)*(sa_range).^2)));
+% grid on
+% xlabel('Sa (g)')
+% ylabel('Standard deviation in roof drift')
+% legend(strcat('Frequentist SSE = ',num2str(SSE_Freq)),strcat('Bayesian SSE = ',num2str(SSE_Bayes)),strcat('Fit to actual data SSE = ',num2str(SSE_Fit)))
 %% Fisher's scoring algorithm
 % Written by Somayajulu on March 25, 2016
 % CHANGE THE PATH IF NECESSARY
